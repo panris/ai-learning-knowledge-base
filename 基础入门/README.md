@@ -45,9 +45,9 @@
 ## 三、必读文章
 
 ### 概念科普
-- [什么是大语言模型（LLM）？](https://www.zhihu.com/question/594516214)
-- [ChatGPT 是怎么工作的？](https://www.ruanyifeng.com/blog/2023/03/chatgpt.html)
-- [AI、机器学习、深度学习的区别](https://zhuanlan.zhihu.com/p/547965988)
+- [什么是大语言模型（LLM）？](https://learningprompt.wiki/)
+- [ChatGPT 是怎么工作的？](https://learningprompt.wiki/docs-chatgpt-tutorial/)
+- [AI、机器学习、深度学习的区别](https://learningprompt.wiki/docs/chatgpt-tutorial/chatgpt-prompts-best)
 
 ### 入门教程
 - [ChatGPT 完全使用手册](https://learningprompt.wiki/)
