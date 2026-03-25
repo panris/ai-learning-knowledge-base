@@ -13,6 +13,7 @@
 | [ChatGPT 从入门到精通](https://www.bilibili.com/video/BV1AT41187Qt) | 李自然说 | 2小时 | 系统讲解 ChatGPT 使用 |
 | [AI 时代生存指南](https://www.bilibili.com/video/BV1u24y1G7Z3) | 老蒋巨靠谱 | 40分钟 | 普通人如何用 AI |
 | [10分钟搞懂 AI](https://www.bilibili.com/video/BV1bM41147uL) | 回形针 | 10分钟 | 科普向，通俗易懂 |
+| [AI 系统学习视频](https://www.bilibili.com/video/BV1UQPZzqEN6) | B站 | - | AI 知识系统性学习 |
 | [提示词工程入门](https://www.bilibili.com/video/BV1Mo4y1t7dD) | 林亦LYi | 1小时 | 如何写好 Prompt |
 
 ### 📺 YouTube（需特殊网络）
