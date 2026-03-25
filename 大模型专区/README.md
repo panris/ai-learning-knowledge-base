@@ -118,9 +118,9 @@
 
 ### 科普文章
 
-- [图解大模型](https://zhuanlan.zhihu.com/p/636488690)
-- [ChatGPT 技术原理](https://www.ruanyifeng.com/blog/2023/03/chatgpt.html)
-- [大模型发展简史](https://zhuanlan.zhihu.com/p/616942445)
+- [图解大模型](https://learningprompt.wiki/)
+- [ChatGPT 技术原理](https://learningprompt.wiki/docs/llm-tutorial/)
+- [大模型发展简史](https://learningprompt.wiki/docs/llm-tutorial/)
 
 ### 技术入门
 
