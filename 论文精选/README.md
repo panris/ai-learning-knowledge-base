@@ -19,7 +19,7 @@
 - 引入 Self-Attention 机制
 - 抛弃了传统的 RNN/LSTM
 
-**中文解读**：[Transformer 详解](https://zhuanlan.zhihu.com/p/44121378)
+**中文解读**：[Transformer 详解](https://learningprompt.wiki/docs/llm-tutorial/)
 
 ---
 
@@ -77,7 +77,7 @@
 
 **意义**：RLHF 方法的开创性工作
 
-**中文解读**：[RLHF 原理详解](https://zhuanlan.zhihu.com/p/595579042)
+**中文解读**：[RLHF 原理详解](https://learningprompt.wiki/docs/llm-tutorial/)
 
 ---
 
