@@ -153,7 +153,21 @@
 
 ---
 
-## 四、项目资源
+## 四、编程实战课程
+
+### ☕ Java + AI 开发
+
+| 课程 | 链接 | 内容 | 难度 |
+|------|------|------|------|
+| [Spring AI Java 课程](https://www.bilibili.com/video/BV1tpAZzeEgD) | B站 | Java + Spring AI 框架开发 AI 应用，涵盖大模型调用、RAG、Agent 等 | 中等 |
+
+> **Spring AI 简介：** Spring 官方 AI 应用开发框架，让 Java 开发者用熟悉的 Spring 生态快速接入 OpenAI、Claude、Ollama 等大模型，构建 RAG、Agent、对话等 AI 应用。
+
+> **适合人群：** 有 Java/Spring Boot 基础，想做 AI 应用开发的工程师
+
+---
+
+## 五、项目资源
 
 ### 开源项目（GitHub）
 
@@ -171,7 +185,7 @@
 
 ---
 
-## 五、学习路径建议
+## 六、学习路径建议
 
 ```
 第1周：完成项目1（写公众号文章）
