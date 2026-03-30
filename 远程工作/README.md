@@ -1,7 +1,6 @@
 # 🌍 远程工作资源大全
 
 > 精选远程工作相关资源，涵盖求职、工具、合租、法律财务等。
-> 内容整理自 [lukasz-madon/awesome-remote-job](https://github.com/lukasz-madon/awesome-remote-job)，CC0 开源协议。
 
 ---
 
