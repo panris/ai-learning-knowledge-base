@@ -5,6 +5,22 @@
 
 ---
 
+## 📑 AI 工程面试专题（200+ 题）
+
+> 系统整理自 [ai-engineering-interview-questions](https://github.com/amitshekhariitbhu/ai-engineering-interview-questions)，覆盖 AI Engineer / LLM Engineer / Agent Engineer 岗位。
+
+| 专题 | 题数 | 内容 |
+|------|------|------|
+| [🧠 LLM 基础](./LLM基础.md) | 25+ | Transformer、注意力、生成推理、MoE、蒸馏 |
+| [💬 提示词工程](./提示词工程.md) | 16+ | CoT、ReAct、Prompt 注入、Few-shot、多语言 |
+| [📚 RAG 专题](./RAG专题.md) | 22+ | 分块、Embedding、混合搜索、Graph RAG、评估 |
+| [🤖 Agent 专题](./Agent专题.md) | 18+ | ReAct、MCP、工具调用、多 Agent、安全沙箱 |
+| [🔧 微调专题](./微调专题.md) | 18+ | LoRA、QLoRA、RLHF、数据准备、灾难性遗忘 |
+| [🗄️ 向量数据库](./向量数据库.md) | 13+ | Embedding、相似度、ANN、量化、漂移 |
+| [🏗️ 系统设计与 LLMOps](./系统设计.md) | 30+ | 系统设计题、生产部署、评估测试、安全伦理 |
+
+---
+
 ## 一、面试知识体系
 
 ### 📋 AI 算法面试知识图谱
