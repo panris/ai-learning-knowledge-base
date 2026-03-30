@@ -1,7 +1,6 @@
 # 🤖 AI Agent 面试题
 
 > AI Agent、工具调用、MCP、多 Agent 系统等面试核心内容。
-> 内容整理自 [amitshekhariitbhu/ai-engineering-interview-questions](https://github.com/amitshekhariitbhu/ai-engineering-interview-questions)（Apache 2.0）
 
 ---
 
