@@ -1,7 +1,6 @@
 # 🧠 LLM 基础面试题
 
 > 大语言模型核心概念、Transformer 架构、推理机制等面试高频题。
-> 内容整理自 [amitshekhariitbhu/ai-engineering-interview-questions](https://github.com/amitshekhariitbhu/ai-engineering-interview-questions)（Apache 2.0）
 
 ---
 
