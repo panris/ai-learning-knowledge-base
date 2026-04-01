@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LLM 后端面试系统</title>
+  <style>
+    :root {
+      --bg: #0c0c0f;
+      --surface: #13131a;
+      --surface2: #1a1a24;
+      --border: #2a2a3a;
+      --text: #e8e8f0;
+      --text-dim: #8888a0;
+      --accent: #7c6af7;
+      --accent-dim: rgba(124,106,247,0.15);
+      --gold: #f0b840;
+      --green: #4ade80;
+      --orange: #fb923c;
+      --red: #f87171;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; min-height:100vh; }
+    
+    header {
+      background: linear-gradient(135deg, var(--surface) 0%, #1a1030 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 30px;
+      display:flex; align-items:center; gap:16px;
+    }
+    header .logo {
+      width:40px; height:40px; background:var(--accent-dim);
+      border:1px solid var(--accent); border-radius:10px;
+      display:flex; align-items:center; justify-content:center; font-size:20px;
+    }
+    header h1 { font-size:18px; font-weight:700; }
+    header p { font-size:12px; color:var(--text-dim); margin-top:2px; }
+
+    .stats-bar {
+      display:grid; grid-template-columns:repeat(4,1fr);
+      gap:10px; padding:16px 30px;
+      background:var(--surface);
+      border-bottom:1px solid var(--border);
+    }
+    .stat-card {
+      background:var(--surface2); border:1px solid var(--border);
+      border-radius:8px; padding:12px 16px;
+      display:flex; align-items:center; gap:12px;
+    }
+    .stat-icon { font-size:24px; }
+    .stat-num { font-size:22px; font-weight:700; font-family:monospace; }
+    .stat-label { font-size:11px; color:var(--text-dim); margin-top:2px; }
+
+    .main-layout { display:grid; grid-template-columns:280px 1fr 350px; min-height:calc(100vh - 140px); }
+
+    .sidebar {
+      background:var(--surface); border-right:1px solid var(--border);
+      overflow-y:auto; padding:12px;
+    }
+    .module-title {
+      font-size:10px; color:var(--text-dim); letter-spacing:1px;
+      text-transform:uppercase; padding:10px 6px 6px; font-family:monospace;
+    }
+    .q-item {
+      padding:8px 10px; border-radius:6px; cursor:pointer;
+      font-size:13px; margin-bottom:2px;
+      display:flex; align-items:center; gap:8px;
+    }
+    .q-item:hover { background:var(--surface2); }
+    .q-item.active { background:var(--accent-dim); border:1px solid var(--accent); }
+    .q-item.answered { border-left:3px solid var(--green); }
+    .q-num { 
+      min-width:20px; height:20px; border-radius:50%; 
+      background:var(--surface2); border:1px solid var(--border);
+      display:flex; align-items:center; justify-content:center;
+      font-size:10px; font-family:monospace; flex-shrink:0;
+    }
+    .q-item.active .q-num { background:var(--accent); border-color:var(--accent); color:#fff; }
+    .q-item.answered .q-num { background:var(--green); border-color:var(--green); color:#000; }
+    .q-text { line-height:1.3; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+    .question-panel {
+      padding:24px; overflow-y:auto;
+      border-right:1px solid var(--border);
+    }
+    .module-badge {
+      display:inline-block; background:var(--accent-dim); border:1px solid var(--accent);
+      color:var(--accent); font-size:10px; padding:2px 8px; border-radius:12px;
+      font-family:monospace; margin-bottom:12px;
+    }
+    .question-title {
+      font-size:18px; font-weight:700; line-height:1.4; margin-bottom:16px;
+      padding-bottom:16px; border-bottom:1px solid var(--border);
+    }
+    .answer-area {
+      width:100%; min-height:180px; background:var(--surface2);
+      border:1px solid var(--border); border-radius:10px; padding:14px;
+      color:var(--text); font-size:14px;
+      resize:vertical; line-height:1.6; font-family:inherit;
+    }
+    .answer-area:focus { outline:none; border-color:var(--accent); }
+    .btn {
+      padding:10px 20px; border-radius:6px; font-size:13px;
+      cursor:pointer; border:none; font-family:inherit;
+    }
+    .btn-primary { background:var(--accent); color:#fff; }
+    .btn-primary:hover { background:#6b5ae8; }
+    .btn-secondary { background:var(--surface2); color:var(--text); border:1px solid var(--border); }
+    .action-row { display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; }
+
+    .scoring-panel { padding:20px; overflow-y:auto; background:var(--surface); }
+    .scoring-card {
+      background:var(--surface2); border:1px solid var(--border);
+      border-radius:10px; padding:16px; margin-bottom:12px;
+    }
+    .score-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+    .score-circle {
+      width:64px; height:64px; border-radius:50%; display:flex;
+      flex-direction:column; align-items:center; justify-content:center;
+      font-weight:700; font-size:20px; font-family:monospace;
+    }
+    .score-circle.excellent { background:rgba(240,184,64,0.15); color:var(--gold); border:2px solid var(--gold); }
+    .score-circle.good { background:rgba(74,222,128,0.15); color:var(--green); border:2px solid var(--green); }
+    .score-circle.pass { background:rgba(251,146,60,0.15); color:var(--orange); border:2px solid var(--orange); }
+    .score-circle.fail { background:rgba(248,113,113,0.15); color:var(--red); border:2px solid var(--red); }
+    .score-circle span { font-size:9px; color:var(--text-dim); font-weight:400; margin-top:2px; }
+    .dimension { margin-bottom:10px; }
+    .dim-header { display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px; }
+    .dim-label { color:var(--text-dim); }
+    .dim-bar { height:3px; background:var(--border); border-radius:2px; overflow:hidden; }
+    .dim-fill { height:100%; border-radius:2px; background:var(--accent); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🤖</div>
+  <div>
+    <h1>LLM 后端开发面试系统</h1>
+    <p>大模型推理 · RAG · Agent · 部署优化</p>
+  </div>
+</header>
+
+<div class="stats-bar">
+  <div class="stat-card">
+    <span class="stat-icon">📋</span>
+    <div><div class="stat-num" id="stat-total">33</div><div class="stat-label">总题数</div></div>
+  </div>
+  <div class="stat-card">
+    <span class="stat-icon">✅</span>
+    <div><div class="stat-num" id="stat-done">0</div><div class="stat-label">已完成</div></div>
+  </div>
+  <div class="stat-card">
+    <span class="stat-icon">⭐</span>
+    <div><div class="stat-num" id="stat-avg">--</div><div class="stat-label">平均分</div></div>
+  </div>
+  <div class="stat-card">
+    <span class="stat-icon">⏱️</span>
+    <div><div class="stat-num">45</div><div class="stat-label">分钟</div></div>
+  </div>
+</div>
+
+<div class="main-layout">
+  <div class="sidebar" id="sidebar"></div>
+  <div class="question-panel" id="questionPanel">
+    <p style="text-align:center; padding:60px 0; color:var(--text-dim);">🎯 从左侧选择题目开始</p>
+  </div>
+  <div class="scoring-panel" id="scoringPanel">
+    <p style="text-align:center; color:var(--text-dim);">📊 填写答案后点击评分</p>
+  </div>
+</div>
+
+<script>
+var questions = [
+  {module:"LLM基础", id:1, title:"LLM的Tokenizer原理是什么？BPE、WordPiece、SentencePiece有什么区别？", ref:"Tokenizer将文本转换为token序列。BPE基于词频迭代合并最高频字节对，WordPiece基于语言学概率合并subword，SentencePiece是统一框架支持多语言无监督分词。"},
+  {module:"LLM基础", id:2, title:"解释Transformer的Self-Attention计算过程，Q/K/V的作用是什么？", ref:"Attention(Q,K,V) = softmax(QK^T / √d_k) × V。Q是查询向量表示当前位置想查询什么信息，K是键向量表示每个位置包含什么信息，V是值向量表示实际要传递的内容。"},
+  {module:"LLM基础", id:3, title:"KV Cache的原理？为什么能加速推理？瓶颈在哪里？", ref:"自回归生成时将已计算的Key和Value缓存起来，新token只需计算自己的Q，从Cache取历史K/V。加速是因为避免重复计算，从O(n²)降到O(n)。瓶颈是内存随序列长度线性增长。"},
+  {module:"LLM基础", id:4, title:"什么是RoPE旋转位置编码？相比绝对/相对位置编码的优势？", ref:"RoPE在复数域对Query和Key做旋转矩阵编码位置信息，两个token的相对位置等于旋转角度之差。优势是外推能力强、理论优雅、自然长期衰减。"},
+  {module:"LLM基础", id:5, title:"Flash Attention的核心思想是什么？解决了什么问题？", ref:"IO感知的注意力分块计算。将N×N矩阵分成T×T小块，每次只加载一个块到SRAM，减少HBM访问次数。显存从O(N²)降到O(N)，速度提升2-4倍。"},
+  {module:"LLM基础", id:6, title:"什么是MoE混合专家？为什么能实现大模型参数+小激活量？", ref:"将FFN替换为多个Expert，通过Gate网络选择激活top-k个Expert。参数量等于所有Expert之和，但每次推理只激活少数Expert，实现稀疏激活。"},
+  {module:"LLM基础", id:7, title:"Prefill和Decode阶段的区别？优化策略有何不同？", ref:"Prefill处理输入prompt建立KV Cache，是计算密集型。Decode自回归生成新token，是访存密集型。Prefill优化用TP和量化，Decode优化用Continuous Batching和PagedAttention。"},
+  {module:"LLM基础", id:8, title:"什么是Speculative Decoding投机解码？为什么能加速？", ref:"用小模型快速生成K个候选token，大模型一次性验证。接受率70-90%时可实现2-3倍加速。适合流式输出，但接受率低时反而更慢。"},
+  {module:"LLM基础", id:9, title:"LLM输出的非确定性来源有哪些？如何控制？", ref:"来源包括采样过程、浮点精度、CUDA非确定性。控制方法有do_sample=False贪心解码、设置seed参数、约束解码。确定性CUDA模式会牺牲少量性能。"},
+  {module:"LLM基础", id:10, title:"GQA和MHA的区别？", ref:"MHA的N个Query头对应N份独立KV，GQA的N个Query头对应G份KV。GQA在内存和表达能力之间取得平衡。LLaMA 2 70B使用32个Query头和8个KV头。"},
+  {module:"推理优化", id:11, title:"模型量化的基本原理？INT8/INT4/FP8各自优缺点？", ref:"量化是将原始值除以scale再round得到量化值。INT8接近无损压缩4倍，INT4有损但压缩8倍，FP8几乎无损压缩2倍。GPTQ和AWQ是常用量化方法。"},
+  {module:"推理优化", id:12, title:"vLLM的PagedAttention解决了什么问题？原理是什么？", ref:"解决按最大序列长度预分配KV Cache导致的内存碎片化问题。原理是类比OS虚拟内存分页，将KV Cache分成固定大小block按需分配，避免碎片化。"},
+  {module:"推理优化", id:13, title:"Continuous Batching相比静态批处理的优势？", ref:"静态批处理需要等所有请求到齐才处理，完成也需等最慢请求。Continuous Batching是迭代级调度，完成的请求随时退出，GPU利用率接近100%，吞吐提升3-5倍。"},
+  {module:"推理优化", id:14, title:"Tensor Parallelism在LLM推理中如何工作？", ref:"将Transformer权重矩阵按列或行切分到多张GPU。Attention按列切分W_Q/K/V，FFN按列或行切分。每层一次AllReduce聚合输出。"},
+  {module:"推理优化", id:15, title:"什么是Prefix Caching？为什么能加速多轮对话？", ref:"识别不同请求中的相同前缀如System Prompt，复用其KV Cache。多轮对话中System加历史只计算一次，后续请求直接复用。"},
+  {module:"RAG", id:21, title:"RAG的Lost in the Middle问题？如何缓解？", ref:"上下文检索N个块时，LLM对首尾注意力强，中间位置关注度最低。缓解方法包括逆向排序把重要信息放首尾、元数据重排、主动摘要、Graph RAG。"},
+  {module:"RAG", id:22, title:"混合搜索的原理？为什么比纯向量搜索更好？", ref:"混合搜索等于alpha乘BM25加1减alpha乘向量相似度。向量搜索擅长语义匹配，BM25擅长专有名词。alpha经验值在0.3到0.7之间。"},
+  {module:"RAG", id:23, title:"Re-ranking在RAG中的作用？常见重排模型？", ref:"两阶段检索：向量数据库粗排Top-100，Cross-Encoder精排Top-10。Cross-Encoder能建模query-doc细粒度交互。常见模型有BGE Re-Ranker、Cohere。"},
+  {module:"RAG", id:24, title:"Graph RAG相比普通RAG的优势？什么场景用？", ref:"普通RAG检索独立事实片段，Graph RAG构建知识图谱保留实体关系。适合复杂关系推理、多跳问题、总结性回答、实体密集领域如法律医疗。"},
+  {module:"RAG", id:25, title:"HNSW和IVF索引的区别？如何选择？", ref:"HNSW是分层NSW图索引，适合高精度场景。IVF是K-Means聚类的倒排索引，适合大数据量场景。生产环境推荐HNSW或HNSW加IVF组合。"},
+  {module:"Agent", id:26, title:"ReAct模式的原理？如何避免Agent陷入死循环？", ref:"ReAct格式是Thought到Action到Observation交替循环。避免死循环的方法有最大步数限制、重复检测、预算控制、置信度阈值、人类确认。"},
+  {module:"Agent", id:27, title:"MCP的核心思想？", ref:"MCP标准化工具接口，类似USB-C。定义统一的数据格式JSON Schema，服务端定义工具客户端统一调用，一次实现多Host通用。"},
+  {module:"Agent", id:28, title:"Agent的记忆系统如何设计？", ref:"三种记忆层次：短期记忆是对话上下文，情景记忆用向量数据库存储关键事件，长期记忆用知识图谱持久化。需要优先级注入和截断控制。"},
+  {module:"Agent", id:29, title:"如何设计安全的代码执行Agent？", ref:"安全层包括网络隔离沙箱无外网、资源限制CPU内存磁盘超时、文件系统只读或限制在tmp、权限控制非root、输出过滤脱敏。"},
+  {module:"部署", id:31, title:"vLLM vs TGI vs TensorRT-LLM如何选择？", ref:"vLLM的PagedAttention吞吐高适合高并发。TGI易用特性全适合快速部署。TRT-LLM是NVIDIA极致优化适合超大模型低延迟。70B以下推荐vLLM。"},
+  {module:"部署", id:32, title:"LLM服务中如何实现超时处理和降级策略？", ref:"超时处理用asyncio.wait_for加TimeoutError捕获。降级分层：L1减少batch，L2备用模型或缓存，L3预设兜底回复。"},
+  {module:"部署", id:33, title:"什么是模型网关Gateway？解决什么问题？", ref:"Gateway统一多LLM提供商如OpenAI、Anthropic、自部署的接口。功能包括鉴权、限流配额、成本路由、多模型failover、监控计费。"},
+  {module:"部署", id:34, title:"如何监控生产环境中的LLM应用？", ref:"性能指标包括TTFT、TPOT、ITL、GPU利用率。质量指标包括幻觉率、用户满意度。成本指标包括token消耗和费用。工具可用LangSmith、Helicone。"},
+  {module:"部署", id:35, title:"如何设计LLM服务的多级缓存？", ref:"L1精确缓存用Redis相同query直接返回。L2语义缓存用Embedding相似度相似query复用。L3 Prompt缓存复用相同System Prompt的KV Cache。"},
+  {module:"向量数据库", id:41, title:"向量数据库如何选型？", ref:"Milvus开源功能全支持混合标量过滤适合大规模生产。Pinecone托管云服务零运维适合快速上手。Chroma轻量本地优先适合RAG原型。"},
+  {module:"向量数据库", id:42, title:"如何评估Embedding模型的质量？MTEB是什么？", ref:"评估维度包括检索Recall@K、MRR、NDCG。MTEB是Massive Text Embedding Benchmark，覆盖45个数据集8类任务，是目前最权威的Embedding评估基准。"},
+  {module:"向量数据库", id:43, title:"向量检索的ANN索引有哪些？", ref:"HNSW是图索引高精度高速度但内存消耗高。IVF是倒排索引内存友好。PQ是乘积量化压缩存储。组合HNSW加IVF加PQ效果最好。"}
+];
+
+var currentQ = null;
+var results = {};
+
+function renderSidebar() {
+  var sidebar = document.getElementById('sidebar');
+  var modules = {};
+  for (var i = 0; i < questions.length; i++) {
+    var q = questions[i];
+    if (!modules[q.module]) modules[q.module] = [];
+    modules[q.module].push(q);
+  }
+  var html = '';
+  for (var mod in modules) {
+    html += '<div class="module-title">' + mod + '</div>';
+    var qs = modules[mod];
+    for (var j = 0; j < qs.length; j++) {
+      var q = qs[j];
+      var answered = results[q.id] ? ' answered' : '';
+      var active = currentQ && currentQ.id === q.id ? ' active' : '';
+      html += '<div class="q-item' + active + answered + '" data-id="' + q.id + '">';
+      html += '<div class="q-num">' + q.id + '</div>';
+      html += '<div class="q-text">' + q.title.substring(0, 28) + '...</div></div>';
+    }
+  }
+  sidebar.innerHTML = html;
+  
+  var items = sidebar.querySelectorAll('.q-item');
+  for (var k = 0; k < items.length; k++) {
+    items[k].onclick = function() {
+      selectQ(parseInt(this.getAttribute('data-id')));
+    };
+  }
+}
+
+function selectQ(id) {
+  for (var i = 0; i < questions.length; i++) {
+    if (questions[i].id === id) { currentQ = questions[i]; break; }
+  }
+  renderSidebar();
+  renderQuestion();
+  document.getElementById('scoringPanel').innerHTML = '<p style="text-align:center; color:var(--text-dim); padding:20px;">📊 填写答案后点击评分</p>';
+}
+
+function renderQuestion() {
+  if (!currentQ) return;
+  var panel = document.getElementById('questionPanel');
+  var answered = results[currentQ.id];
+  var html = '<div class="module-badge">' + currentQ.module + '</div>';
+  html += '<div class="question-title">Q' + currentQ.id + '：' + currentQ.title + '</div>';
+  html += '<textarea class="answer-area" id="answerInput" placeholder="请输入你的回答...">' + (answered ? answered.text : '') + '</textarea>';
+  html += '<div class="action-row">';
+  html += '<button class="btn btn-primary" id="scoreBtn">🤖 评分</button>';
+  html += '<button class="btn btn-secondary" id="refBtn">📖 参考答案</button>';
+  html += '</div>';
+  html += '<div id="refAnswer" style="display:none; margin-top:14px; padding:14px; background:var(--surface2); border-radius:8px; font-size:13px; line-height:1.7;">' + currentQ.ref + '</div>';
+  panel.innerHTML = html;
+  
+  document.getElementById('scoreBtn').onclick = doScoring;
+  document.getElementById('refBtn').onclick = function() {
+    var el = document.getElementById('refAnswer');
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+  };
+}
+
+function doScoring() {
+  var text = document.getElementById('answerInput').value.trim();
+  if (!text) { alert('请先填写回答！'); return; }
+  
+  var btn = document.getElementById('scoreBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ 评分中...';
+  
+  setTimeout(function() {
+    var result = scoringEngine(text, currentQ);
+    results[currentQ.id] = {total: result.total, text: text};
+    renderScoring(result);
+    updateStats();
+    renderSidebar();
+    btn.disabled = false;
+    btn.textContent = '🤖 重新评分';
+  }, 800);
+}
+
+function scoringEngine(answer, q) {
+  var userText = answer.toLowerCase();
+  var refText = (q.ref || "").toLowerCase();
+  
+  // 简单分词：按空格和标点分割
+  function getWords(str) {
+    return str.replace(/[，。！？、；：""''（）【】《》\n\r\t,.!?;:()]/g, ' ')
+              .split(/\s+/)
+              .filter(function(w) { return w.length >= 2; });  // 至少2个字符才算词
+  }
+  
+  var userWords = getWords(userText);
+  var refWords = getWords(refText);
+  
+  // 计算参考答案词汇被用户答案覆盖的比例
+  var refWordSet = {};
+  for (var i = 0; i < refWords.length; i++) {
+    refWordSet[refWords[i]] = true;
+  }
+  
+  var matchCount = 0;
+  for (var j = 0; j < userWords.length; j++) {
+    if (refWordSet[userWords[j]]) {
+      matchCount++;
+    }
+  }
+  
+  // 覆盖率：用户答案命中了多少参考答案的词
+  var coverage = refWords.length > 0 ? matchCount / refWords.length : 0.5;
+  
+  // 长度比：用户答案长度占参考答案长度的比例
+  var lenRatio = refText.length > 0 ? Math.min(1.2, userText.length / refText.length) : 0.5;
+  
+  // 计算三个维度
+  // 准确性：主要看覆盖率
+  var accuracy = Math.min(100, Math.round(35 + coverage * 65));
+  
+  // 完整性：看长度是否接近参考答案
+  var completeness = Math.min(100, Math.round(30 + lenRatio * 40 + coverage * 30));
+  
+  // 深度：看回答长度和覆盖率
+  var depth = Math.min(100, Math.round(30 + coverage * 40 + Math.min(30, userText.length / 5)));
+  
+  // 总分
+  var total = Math.round(accuracy * 0.45 + completeness * 0.30 + depth * 0.25);
+  
+  return {total: total, accuracy: accuracy, completeness: completeness, depth: depth};
+}
+
+function renderScoring(r) {
+  var grade = r.total >= 85 ? 'excellent' : r.total >= 70 ? 'good' : r.total >= 55 ? 'pass' : 'fail';
+  var gradeText = r.total >= 85 ? '🥇 优秀' : r.total >= 70 ? '🥈 良好' : r.total >= 55 ? '🥉 一般' : '⚠️ 待改进';
+  
+  var html = '<div class="scoring-card">';
+  html += '<div class="score-header">';
+  html += '<div style="font-size:14px; font-weight:600;">' + gradeText + '</div>';
+  html += '<div class="score-circle ' + grade + '">' + r.total + '<span>分</span></div>';
+  html += '</div>';
+  html += '<div class="dimension"><div class="dim-header"><span class="dim-label">准确性</span><span>' + r.accuracy + '</span></div>';
+  html += '<div class="dim-bar"><div class="dim-fill" style="width:' + r.accuracy + '%"></div></div></div>';
+  html += '<div class="dimension"><div class="dim-header"><span class="dim-label">完整性</span><span>' + r.completeness + '</span></div>';
+  html += '<div class="dim-bar"><div class="dim-fill" style="width:' + r.completeness + '%"></div></div></div>';
+  html += '<div class="dimension"><div class="dim-header"><span class="dim-label">深度</span><span>' + r.depth + '</span></div>';
+  html += '<div class="dim-bar"><div class="dim-fill" style="width:' + r.depth + '%"></div></div></div>';
+  html += '</div>';
+  
+  document.getElementById('scoringPanel').innerHTML = html;
+}
+
+function updateStats() {
+  var count = 0, sum = 0;
+  for (var k in results) { count++; sum += results[k].total; }
+  document.getElementById('stat-done').textContent = count;
+  if (count > 0) document.getElementById('stat-avg').textContent = Math.round(sum / count);
+}
+
+renderSidebar();
+</script>
+</body>
+</html>
