@@ -21,6 +21,28 @@
 
 ---
 
+## 🎯 大模型后端开发面试系统
+
+> 📄 [面试题库（Markdown）](./大模型后端面试系统.md) | 🌐 [交互式网页版（含 AI 自动评分）](./interview-scoring.html)
+
+### 43 道面试题 + AI 自动评分，覆盖 6 大模块：
+
+| 模块 | 题数 | 核心考点 |
+|------|------|---------|
+| LLM 基础 | 10 题 | Tokenizer、Transformer、KV Cache、RoPE、Flash Attention、MoE |
+| 推理优化 | 10 题 | 量化、PagedAttention、Continuous Batching、TP、Speculative Decoding |
+| RAG 与向量数据库 | 5 题 | Lost in Middle、混合搜索、Re-ranking、Graph RAG、HNSW |
+| Agent 与工具调用 | 5 题 | ReAct、MCP、记忆系统、代码沙箱安全 |
+| 模型部署与服务化 | 10 题 | vLLM/TGI/TRT-LLM、Gateway、限流调度、监控 |
+| 向量数据库与 Embedding | 3 题 | 选型、MTEB、ANN 索引 |
+
+### 评分维度
+- **准确性**（35%）：核心概念是否正确
+- **完整性**（35%）：是否覆盖主要知识点
+- **深度**（30%）：是否有深入理解和独到见解
+
+---
+
 ## 一、面试知识体系
 
 ### 📋 AI 算法面试知识图谱
