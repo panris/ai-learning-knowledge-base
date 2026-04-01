@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LLM 后端面试系统 - AI 自动评分</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0c0c0f;
+      --surface: #13131a;
+      --surface2: #1a1a24;
+      --border: #2a2a3a;
+      --text: #e8e8f0;
+      --text-dim: #8888a0;
+      --accent: #7c6af7;
+      --accent-dim: rgba(124,106,247,0.15);
+      --gold: #f0b840;
+      --green: #4ade80;
+      --orange: #fb923c;
+      --red: #f87171;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:var(--bg); color:var(--text); font-family:'Noto Serif SC',serif; min-height:100vh; }
+    
+    /* HEADER */
+    header {
+      background: linear-gradient(135deg, var(--surface) 0%, #1a1030 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 24px 40px;
+      display:flex; align-items:center; gap:20px;
+    }
+    header .logo {
+      width:44px; height:44px; background:var(--accent-dim);
+      border:1px solid var(--accent); border-radius:12px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:22px;
+    }
+    header h1 { font-size:20px; font-weight:700; letter-spacing:-0.3px; }
+    header p { font-size:13px; color:var(--text-dim); font-family:monospace; margin-top:2px; }
+
+    /* STATS BAR */
+    .stats-bar {
+      display:grid; grid-template-columns:repeat(4,1fr);
+      gap:12px; padding:20px 40px;
+      background:var(--surface);
+      border-bottom:1px solid var(--border);
+    }
+    .stat-card {
+      background:var(--surface2); border:1px solid var(--border);
+      border-radius:10px; padding:16px 20px;
+      display:flex; align-items:center; gap:14px;
+    }
+    .stat-icon { font-size:28px; }
+    .stat-info .stat-num { font-size:26px; font-weight:700; font-family:'JetBrains Mono',monospace; }
+    .stat-info .stat-label { font-size:12px; color:var(--text-dim); margin-top:2px; }
+    .stat-card.highlight { border-color:var(--accent); background:var(--accent-dim); }
+
+    /* MAIN LAYOUT */
+    .main-layout { display:grid; grid-template-columns:320px 1fr 380px; min-height:calc(100vh - 160px); }
+
+    /* SIDEBAR */
+    .sidebar {
+      background:var(--surface); border-right:1px solid var(--border);
+      overflow-y:auto; padding:16px;
+    }
+    .sidebar::-webkit-scrollbar { width:4px; }
+    .sidebar::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+    .module-title {
+      font-size:11px; color:var(--text-dim); letter-spacing:1.5px;
+      text-transform:uppercase; padding:12px 8px 8px; font-family:'JetBrains Mono',monospace;
+    }
+    .q-item {
+      padding:10px 12px; border-radius:8px; cursor:pointer;
+      font-size:14px; transition:all 0.15s; margin-bottom:2px;
+      display:flex; align-items:flex-start; gap:10px;
+    }
+    .q-item:hover { background:var(--surface2); }
+    .q-item.active { background:var(--accent-dim); border:1px solid var(--accent); }
+    .q-item.answered { border-left:3px solid var(--green); }
+    .q-item.current { border-left:3px solid var(--gold); }
+    .q-num { 
+      min-width:22px; height:22px; border-radius:50%; 
+      background:var(--surface2); border:1px solid var(--border);
+      display:flex; align-items:center; justify-content:center;
+      font-size:11px; font-family:'JetBrains Mono',monospace; flex-shrink:0;
+    }
+    .q-item.active .q-num { background:var(--accent); border-color:var(--accent); color:#fff; }
+    .q-item.answered .q-num { background:var(--green); border-color:var(--green); color:#000; font-size:10px; }
+    .q-item.current .q-num { background:var(--gold); border-color:var(--gold); color:#000; }
+    .q-text { line-height:1.4; }
+
+    /* CENTER - QUESTION PANEL */
+    .question-panel {
+      padding:28px 32px; overflow-y:auto;
+      border-right:1px solid var(--border);
+    }
+    .question-panel::-webkit-scrollbar { width:4px; }
+    .question-panel::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+    .module-badge {
+      display:inline-block; background:var(--accent-dim); border:1px solid var(--accent);
+      color:var(--accent); font-size:11px; padding:3px 10px; border-radius:20px;
+      font-family:'JetBrains Mono',monospace; margin-bottom:16px;
+    }
+    .question-title {
+      font-size:20px; font-weight:700; line-height:1.5; margin-bottom:20px;
+      padding-bottom:20px; border-bottom:1px solid var(--border);
+    }
+    .answer-section h3 { font-size:14px; color:var(--text-dim); margin-bottom:12px; font-weight:400; }
+    .answer-area {
+      width:100%; min-height:200px; background:var(--surface2);
+      border:1px solid var(--border); border-radius:12px; padding:16px;
+      color:var(--text); font-family:'Noto Serarif SC',serif; font-size:15px;
+      resize:vertical; line-height:1.7; transition:border-color 0.2s;
+    }
+    .answer-area:focus { outline:none; border-color:var(--accent); }
+    .answer-area::placeholder { color:var(--text-dim); }
+    .action-row { display:flex; gap:12px; margin-top:16px; flex-wrap:wrap; }
+    .btn {
+      padding:10px 24px; border-radius:8px; font-size:14px;
+      cursor:pointer; transition:all 0.15s; border:none; font-family:inherit;
+    }
+    .btn-primary {
+      background:var(--accent); color:#fff;
+    }
+    .btn-primary:hover { background:#6b5ae8; transform:translateY(-1px); }
+    .btn-primary:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+    .btn-secondary { background:var(--surface2); color:var(--text); border:1px solid var(--border); }
+    .btn-secondary:hover { border-color:var(--accent); }
+    .btn-hint { font-size:12px; color:var(--text-dim); margin-top:8px; }
+
+    /* SCORING PANEL */
+    .scoring-panel { padding:24px; overflow-y:auto; background:var(--surface); }
+    .scoring-panel::-webkit-scrollbar { width:4px; }
+    .scoring-panel::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+    .scoring-empty {
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      height:300px; text-align:center; color:var(--text-dim);
+    }
+    .scoring-empty .emoji { font-size:48px; margin-bottom:16px; opacity:0.5; }
+    .scoring-empty h3 { font-size:16px; margin-bottom:8px; color:var(--text); }
+    .scoring-card {
+      background:var(--surface2); border:1px solid var(--border);
+      border-radius:12px; padding:20px; margin-bottom:16px;
+      animation:fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .score-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+    .score-circle {
+      width:72px; height:72px; border-radius:50%; display:flex;
+      flex-direction:column; align-items:center; justify-content:center;
+      font-weight:700; font-size:22px; font-family:'JetBrains Mono',monospace;
+    }
+    .score-circle.excellent { background:rgba(240,184,64,0.15); color:var(--gold); border:2px solid var(--gold); }
+    .score-circle.good { background:rgba(74,222,128,0.15); color:var(--green); border:2px solid var(--green); }
+    .score-circle.pass { background:rgba(251,146,60,0.15); color:var(--orange); border:2px solid var(--orange); }
+    .score-circle.fail { background:rgba(248,113,113,0.15); color:var(--red); border:2px solid var(--red); }
+    .score-circle span { font-size:10px; color:var(--text-dim); font-weight:400; margin-top:2px; }
+    .score-grade { font-size:16px; font-weight:700; }
+    .score-grade.excellent { color:var(--gold); }
+    .score-grade.good { color:var(--green); }
+    .score-grade.pass { color:var(--orange); }
+    .score-grade.fail { color:var(--red); }
+    .score-meta { font-size:12px; color:var(--text-dim); margin-top:4px; }
+    .dimension { margin-bottom:12px; }
+    .dim-header { display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px; }
+    .dim-label { color:var(--text-dim); }
+    .dim-score { font-family:'JetBrains Mono',monospace; font-weight:600; }
+    .dim-bar { height:4px; background:var(--border); border-radius:2px; overflow:hidden; }
+    .dim-fill { height:100%; border-radius:2px; transition:width 0.6s ease; }
+    .dim-fill.accent { background:var(--accent); }
+    .dim-fill.green { background:var(--green); }
+    .dim-fill.orange { background:var(--orange); }
+    .dim-fill.red { background:var(--red); }
+    .feedback-section { margin-top:16px; }
+    .feedback-title { font-size:12px; color:var(--text-dim); margin-bottom:8px; text-transform:uppercase; letter-spacing:1px; }
+    .feedback-item {
+      background:var(--bg); border-radius:8px; padding:12px; margin-bottom:8px;
+      font-size:13px; line-height:1.6; border-left:3px solid;
+    }
+    .feedback-item.strength { border-color:var(--green); }
+    .feedback-item.weakness { border-color:var(--orange); }
+    .feedback-item.suggestion { border-color:var(--accent); }
+    .feedback-item .fb-label { font-size:11px; font-weight:600; margin-bottom:4px; font-family:'JetBrains Mono',monospace; }
+    .feedback-item.strength .fb-label { color:var(--green); }
+    .feedback-item.weakness .fb-label { color:var(--orange); }
+    .feedback-item.suggestion .fb-label { color:var(--accent); }
+
+    /* LOADING */
+    .loading-card {
+      background:var(--surface2); border:1px solid var(--border);
+      border-radius:12px; padding:32px; text-align:center;
+    }
+    .loading-dots { display:flex; gap:8px; justify-content:center; margin-bottom:16px; }
+    .loading-dots span {
+      width:10px; height:10px; border-radius:50%; background:var(--accent);
+      animation:bounce 1.2s infinite;
+    }
+    .loading-dots span:nth-child(2){animation-delay:0.2s}
+    .loading-dots span:nth-child(3){animation-delay:0.4s}
+    @keyframes bounce { 0%,80%,100%{transform:scale(0.6);opacity:0.4} 40%{transform:scale(1);opacity:1} }
+    .loading-text { color:var(--text-dim); font-size:14px; }
+
+    /* TABS */
+    .tabs { display:flex; gap:4px; margin-bottom:16px; background:var(--bg); padding:4px; border-radius:10px; }
+    .tab {
+      flex:1; padding:8px; text-align:center; font-size:13px;
+      border-radius:8px; cursor:pointer; transition:all 0.15s; color:var(--text-dim);
+    }
+    .tab.active { background:var(--accent); color:#fff; }
+
+    /* REFERENCE ANSWER */
+    .ref-answer {
+      margin-top:20px; background:var(--bg); border:1px solid var(--border);
+      border-radius:10px; padding:16px; font-size:13px; line-height:1.7;
+      max-height:0; overflow:hidden; transition:max-height 0.4s ease;
+    }
+    .ref-answer.open { max-height:2000px; }
+    .ref-toggle {
+      display:flex; align-items:center; gap:8px; cursor:pointer;
+      color:var(--accent); font-size:13px; margin-top:12px;
+    }
+    .ref-toggle:hover { opacity:0.8; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🤖</div>
+  <div>
+    <h1>LLM 后端开发面试系统</h1>
+    <p>大模型推理 · RAG · Agent · 部署优化 · AI 自动评分</p>
+  </div>
+</header>
+
+<div class="stats-bar">
+  <div class="stat-card">
+    <span class="stat-icon">📋</span>
+    <div><div class="stat-num" id="stat-total">43</div><div class="stat-label">总题数</div></div>
+  </div>
+  <div class="stat-card">
+    <span class="stat-icon">✅</span>
+    <div><div class="stat-num" id="stat-done">0</div><div class="stat-label">已完成</div></div>
+  </div>
+  <div class="stat-card highlight">
+    <span class="stat-icon">⭐</span>
+    <div><div class="stat-num" id="stat-avg">--</div><div class="stat-label">平均分</div></div>
+  </div>
+  <div class="stat-card">
+    <span class="stat-icon">⏱️</span>
+    <div><div class="stat-num">45</div><div class="stat-label">推荐时长(分钟)</div></div>
+  </div>
+</div>
+
+<div class="main-layout">
+  <!-- LEFT SIDEBAR -->
+  <div class="sidebar" id="sidebar"></div>
+
+  <!-- CENTER QUESTION -->
+  <div class="question-panel" id="questionPanel">
+    <div style="text-align:center; padding:80px 0; color:var(--text-dim);">
+      <div style="font-size:48px; margin-bottom:16px;">🎯</div>
+      <p style="font-size:16px;">从左侧选择一道题目开始面试</p>
+    </div>
+  </div>
+
+  <!-- RIGHT SCORING -->
+  <div class="scoring-panel" id="scoringPanel">
+    <div class="scoring-empty">
+      <div class="emoji">📊</div>
+      <h3>等待评分</h3>
+      <p style="font-size:13px;">填写答案后点击"AI 评分"<br>即可获得详细评分报告</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===================== 题库数据 =====================
+const questions = [
+  // 模块一：LLM 基础
+  { module:"模块一：LLM 基础", id:1, title:"LLM 的 Tokenizer 原理是什么？BPE、WordPiece、SentencePiece 有什么区别？", ref:`Tokenizer 将文本转换为 token 序列。
+
+| 方法 | 原理 | 代表模型 |
+|------|------|---------|
+| BPE | 从字符级迭代合并最高频字节对 | GPT-2、LLaMA |
+| WordPiece | 基于概率最大化合并 subword | BERT |
+| SentencePiece | 统一框架，支持 BPE/UNIGRAM | 多语言模型 |
+
+BPE 基于词频合并，WordPiece 基于语言学概率，SentencePiece 是实现框架支持任意语言无监督分词。` },
+  { module:"模块一：LLM 基础", id:2, title:"解释 Transformer 的 Self-Attention 计算过程，Q/K/V 的作用是什么？", ref:`Attention(Q,K,V) = softmax(QK^T / √d_k) × V
+
+计算过程：输入词嵌入通过 W_Q、W_K、W_V 得到 Q、K、V → Q 与所有 K 计算点积 → 缩放 → softmax 得到注意力权重 → 用权重对 V 加权求和。
+
+Q: 当前位置"想查询什么信息"
+K: 每个位置"自己包含什么信息"  
+V: 每个位置"实际要传递的内容"` },
+  { module:"模块一：LLM 基础", id:3, title:"KV Cache 的原理？为什么能加速推理？瓶颈在哪里？", ref:`自回归生成时，将已计算的 Key 和 Value 缓存起来，新 token 只需计算自己的 Q，从 Cache 取历史 K/V。
+
+加速：从 O(n²) 降低到 O(n)。
+
+瓶颈：内存随序列长度线性增长，33B 模型 32K 上下文约需 16GB+。PagedAttention 通过分页管理解决碎片化。` },
+  { module:"模块一：LLM 基础", id:4, title:"什么是 RoPE（旋转位置编码）？相比绝对/相对位置编码的优势？", ref:`RoPE 在复数域对 Query 和 Key 做旋转矩阵编码位置信息，两个 token 的相对位置 = 旋转角度之差。
+
+优势：外推能力强（通过缩放扩展）、理论优雅（几何解释）、自然长期衰减。ALiBi 是另一种外推方案。` },
+  { module:"模块一：LLM 基础", id:5, title:"Flash Attention 的核心思想是什么？解决了什么问题？", ref:`IO 感知的注意力分块计算。将 N×N 矩阵分成 T×T 小块，每次只加载一个块到 SRAM，减少 HBM 访问次数。
+
+显存从 O(N²) 降到 O(N)（近似但结果精确），速度提升 2-4 倍，已集成到 vLLM、TGI。` },
+  { module:"模块一：LLM 基础", id:6, title:"什么是 MoE（混合专家）？为什么能实现"大模型参数+小激活量"？", ref:`将 FFN 替换为多个 Expert，通过 Gate 网络选择激活 top-k 个 Expert。
+
+output = Σ (Gate(x)_i × Expert_i(x))
+
+参数量 = 所有 Expert 之和（如 8×7B = 46B），但每次推理只激活 2 个 Expert（如 12B 激活参数）。稀疏激活，类比大脑专门化。` },
+  { module:"模块一：LLM 基础", id:7, title:"Prefill 和 Decode 阶段的区别？优化策略有何不同？", ref:`Prefill：处理输入 prompt，建立 KV Cache，计算密集。Decode：自回归生成新 token，访存密集。
+
+Prefill 优化：TP 张量并行、Prefix Caching、KV 量化。
+Decode 优化：Continuous Batching、PagedAttention、Speculative Decoding。` },
+  { module:"模块一：LLM 基础", id:8, title:"什么是 Speculative Decoding（投机解码）？为什么能加速？", ref:`用小模型快速生成 K 个候选 token，大模型一次性验证，接受率 70-90%，理想情况下 2-3 倍加速。适合流式输出，但接受率低时反而更慢。` },
+  { module:"模块一：LLM 基础", id:9, title:"LLM 输出的非确定性来源有哪些？如何控制？", ref:`来源：采样过程、浮点精度、CUDA 非确定性、Prompt 变化。
+
+控制：do_sample=False（贪心解码）、seed 参数、约束解码。确定性 CUDA 模式牺牲少量性能。` },
+  { module:"模块一：LLM 基础", id:10, title:"Grouped-Query Attention (GQA) 和 MHA 的区别？", ref:`MHA：N 个 Query 头 = N 份独立 KV。GQA：N 个 Query 头 = G（如 8）份 KV。平衡内存和表达能力。LLaMA 2 70B：32 个 Query 头，8 个 KV 头。` },
+
+  // 模块二：推理优化
+  { module:"模块二：推理优化", id:11, title:"模型量化的基本原理？INT8/INT4/FP8 各自优缺点？", ref:`量化：原始值 / scale → round → 量化值。
+
+| 方式 | 精度 | 压缩率 | 效果 |
+|------|------|--------|------|
+| INT8 | 8位 | 4× | 接近无损 |
+| INT4 | 4位 | 8× | 有损 |
+| FP8 | 8位浮点 | 2× | 几乎无损 |
+
+GPTQ 逐层量化需校准数据，AWQ 按激活大小加权效果更好。` },
+  { module:"模块二：推理优化", id:12, title:"vLLM 的 PagedAttention 解决了什么问题？原理是什么？", ref:`问题：按最大序列长度预分配 KV Cache，内存碎片化严重。33B 模型 32K 上下文可能只用 4K，浪费 87.5%。
+
+原理：类比 OS 虚拟内存分页，将 KV Cache 分成固定大小 block，按需分配，避免碎片化。
+
+效果：显存利用率提升 2-4 倍，吞吐提升 2-10×。` },
+  { module:"模块二：推理优化", id:13, title:"Continuous Batching 相比静态批处理的优势？", ref:`静态批处理：等所有请求到齐才处理，完成也需等最慢请求。Continuous Batching：迭代级调度，完成随时退出，GPU 利用率接近 100%，吞吐提升 3-5×。` },
+  { module:"模块二：推理优化", id:14, title:"Tensor Parallelism 在 LLM 推理中如何工作？", ref:`将 Transformer 权重矩阵按列/行切分到多张 GPU。Attention 按列切分 W_Q/K/V，FFN 按列/行切分 W_up/down。每层一次 AllReduce 聚合注意力输出。` },
+  { module:"模块二：推理优化", id:15, title:"什么是 Prefix Caching？为什么能加速多轮对话？", ref:`识别不同请求中的相同前缀（System Prompt、RAG 上下文），复用其 KV Cache。多轮对话中 System + 历史只计算一次，后续请求复用。` },
+  { module:"模块二：推理优化", id:16, title:"Disaggregated Prefill 是什么？为什么要把 Prefill 和 Decode 拆开？", ref:`Prefill 计算密集，Decode 访存密集，混在一起导致 Decode 被 Prefill 阻塞、P99 抖动。Disaggregated：Prefill 路由到计算优化实例，Decode 路由到访存优化实例。` },
+  { module:"模块二：推理优化", id:17, title:"LLM 推理指标 TTFT、TPOT、ITL 各自的含义和优化方向？", ref:`TTFT：收到请求到输出第一个 token（Prefill 加速）。TPOT：每个输出 token 平均时间（Decode 优化）。ITL：相邻 token 间隔（Decode 优化）。E2E = TTFT + TPOT × N。` },
+  { module:"模块二：推理优化", id:18, title:"量化感知训练（QAT）和后训练量化（PTQ）的区别？", ref:`PTQ：训练好的模型直接量化，用校准数据确定 scale。QAT：训练中模拟量化，让模型适应量化噪声，效果更好但成本高。INT4 等极端压缩用 QAT。` },
+  { module:"模块二：推理优化", id:19, title:"DeepSeek-V2 中的 MLA 是什么？解决了什么？", ref:`MLA 将 KV 压缩到低维潜在空间，K_cache = W_K @ c（c 是潜在向量），推理时重建 K 和 V。KV Cache 减少 50-70%，等效 MQA 的效率 + MHA 的表达能力。` },
+  { module:"模块二：推理优化", id:20, title:"LLM 推理中如何实现限流和优先级调度？", ref:`限流：令牌桶（API 限流）、滑动窗口（平滑限流）、队列限流（高并发）。调度：SLO 优先级、任务类型优先级（流式优先）、成本感知路由（简单→小模型）。` },
+
+  // 模块三：RAG
+  { module:"模块三：RAG 与向量数据库", id:21, title:"RAG 的 Lost in the Middle 问题？如何缓解？", ref:`上下文检索块 N 个时，LLM 对首尾注意力强，中间位置关注度最低。
+
+缓解：逆向排序（重要信息放首尾）、元数据重排、主动摘要、Graph RAG。` },
+  { module:"模块三：RAG 与向量数据库", id:22, title:"混合搜索的原理？为什么比纯向量搜索更好？", ref:`混合搜索 = α × BM25 + (1-α) × cosine_sim。向量搜索擅长语义，BM25 擅长专有名词。α 经验值：通用 0.3-0.5，专业术语多 0.6-0.7。` },
+  { module:"模块三：RAG 与向量数据库", id:23, title:"Re-ranking 在 RAG 中的作用？常见重排模型？", ref:`两阶段：向量数据库粗排 Top-100 → Cross-Encoder 精排 Top-10。Cross-Encoder 建模 query-doc 细粒度交互。常见模型：BGE Re-Ranker、Cohere Re-Ranker（API）、RankGPT（LLM-based）。` },
+  { module:"模块三：RAG 与向量数据库", id:24, title:"Graph RAG 相比普通 RAG 的优势？什么场景用？", ref:`普通 RAG 检索独立事实片段，Graph RAG 构建知识图谱保留实体关系。
+
+适合：复杂关系推理、多跳问题、总结性回答、实体密集领域（法律、医疗）。` },
+  { module:"模块三：RAG 与向量数据库", id:25, title:"HNSW 和 IVF 索引的区别？如何选择？", ref:`HNSW：分层 NSW 图，贪心搜索，逐层下沉，适合高精度。IVF：K-Means 聚类，查询只搜索最近簇，适合大数据量。生产推荐 HNSW 或 HNSW+IVF。` },
+
+  // 模块四：Agent
+  { module:"模块四：Agent 与工具调用", id:26, title:"ReAct 模式的原理？如何避免 Agent 陷入死循环？", ref:`ReAct 格式：Thought → Action → Observation → ... 交替推理和行动。
+
+避免死循环：最大步数限制、重复检测、预算控制、置信度阈值、人类确认。` },
+  { module:"模块四：Agent 与工具调用", id:27, title:"MCP（Model Context Protocol）的核心思想？", ref:`MCP 标准化工具接口，类似 USB-C，统一的数据格式（JSON Schema），服务端定义工具客户端统一调用，一次实现多 MCP Host 通用。` },
+  { module:"模块四：Agent 与工具调用", id:28, title:"Agent 的记忆系统如何设计？三种记忆的区别？", ref:`短期记忆（对话上下文）→ 情景记忆（向量数据库关键事件）→ 长期记忆（知识图谱持久化）。优先级注入，截断控制长度。` },
+  { module:"模块四：Agent 与工具调用", id:29, title:"如何设计安全的代码执行 Agent？", ref:`安全层：网络隔离（沙箱无外网）、资源限制（CPU/内存/磁盘/超时）、文件系统只读 /tmp、权限控制非 root、输出过滤脱敏。` },
+  { module:"模块四：Agent 与工具调用", id:30, title:"Function Calling 和 MCP 的区别？", ref:`Function Calling：各 LLM API 有不同格式，需单独适配。MCP：统一协议，一次实现 Claude Desktop、Cursor 等多 Host 通用。` },
+
+  // 模块五：部署
+  { module:"模块五：模型部署与服务化", id:31, title:"vLLM vs TGI vs TensorRT-LLM 如何选择？", ref:`vLLM：PagedAttention，吞吐高，适合高并发。TGI：易用特性全，快速部署通用。TRT-LLM：NVIDIA 极致优化（INT8/FP8），适合超大模型低延迟。70B 以下追求吞吐→vLLM，超大模型→TRT-LLM。` },
+  { module:"模块五：模型部署与服务化", id:32, title:"LLM 服务中如何实现超时处理和降级策略？", ref:`超时处理：asyncio.wait_for + TimeoutError 捕获。降级分层：L1 减少 batch，L2 备用模型/缓存，L3 预设兜底回复。` },
+  { module:"模块五：模型部署与服务化", id:33, title:"什么是模型网关（Gateway）？解决什么问题？", ref:`Gateway 统一多 LLM 提供商（OpenAI、Anthropic、自部署）接口。功能：鉴权、限流配额、成本路由（语义路由/成本路由）、多模型 failover、监控计费。开源：Portkey、DeepSeek Gateway。` },
+  { module:"模块五：模型部署与服务化", id:34, title:"如何监控生产环境中的 LLM 应用？", ref:`性能指标：TTFT、TPOT、ITL、GPU 利用率。质量指标：幻觉率、用户满意度、任务完成率。成本指标：token 消耗、费用。工具：LangSmith、Helicone、Prometheus+Grafana。` },
+  { module:"模块五：模型部署与服务化", id:35, title:"如何设计 LLM 服务的多级缓存？", ref:`L1 精确缓存（Redis，相同 query 直接返回）。L2 语义缓存（Embedding 相似度，相似 query 复用）。L3 Prompt 缓存（相同 System Prompt 的 KV Cache 复用）。` },
+  { module:"模块五：模型部署与服务化", id:36, title:"什么是 Shadow Mode 部署？适用场景？", ref:`Shadow Mode：新旧模型同时推理，对比输出，用户只看到旧模型结果。适用：新模型上线前的无声验证，不影响用户体验，适合 A/B 测试前的安全验证。` },
+  { module:"模块五：模型部署与服务化", id:37, title:"A/B 测试在 LLM 系统如何设计？", ref:`流量分层：对照组（旧模型）vs 实验组（新模型/新 Prompt）。评估指标：任务完成率、延迟、用户满意度、成本。统计显著性：p<0.05，足够样本量。渐进式灰度。` },
+  { module:"模块五：模型部署与服务化", id:38, title:"如何处理 LLM 服务中的 Prompt 版本管理？", ref:`Prompt 即代码：Git 管理，版本化存储。灰度发布：新旧 Prompt 逐步切换。回滚机制：Feature Flag 控制。Prompt 注册表：中心化管理，支持 A/B。` },
+  { module:"模块五：模型部署与服务化", id:39, title:"LLM 服务中请求并发和流控如何设计？", ref:`并发控制：令牌桶/滑动窗口限流，请求队列削峰。优先级队列：VIP 优先、SLO 分级。自动扩缩容：KEDA 基于队列深度/Prometheus 指标。` },
+  { module:"模块五：模型部署与服务化", id:40, title:"自托管开源 LLM vs 调用 API 各有什么优缺点？", ref:`自托管：数据隐私好、无供应商风险、长期成本可控，但运维复杂、硬件成本高、能力上限受模型限制。API：能力最强、快速迭代、无运维负担，但成本按量计费、数据经过第三方、可能限流。` },
+
+  // 模块六：向量数据库
+  { module:"模块六：向量数据库与 Embedding", id:41, title:"向量数据库如何选型？Milvus/Pinecone/Chroma 的区别？", ref:`Milvus：开源、功能全、支持混合标量过滤、适合大规模生产。Pinecone：托管云服务、零运维、适合快速上手。Chroma：轻量、本地优先、适合 RAG 原型。` },
+  { module:"模块六：向量数据库与 Embedding", id:42, title:"如何评估 Embedding 模型的质量？MTEB 是什么？", ref:`评估维度：检索 Recall@K、MRR、NDCG，下游任务分类准确率。
+
+MTEB（Massive Text Embedding Benchmark）：45 个数据集覆盖分类、聚类、检索等 8 类任务，综合评估 Embedding 模型能力，是目前最权威的 Benchmark。` },
+  { module:"模块六：向量数据库与 Embedding", id:43, title:"向量检索的 ANN 索引有哪些？HNSW/IVF/PQ 如何选？", ref:`HNSW：图索引，高精度高速度，内存中高。IVF：倒排索引，内存友好。PQ：乘积量化，压缩存储。组合 HNSW+IVF+PQ 效果最好，在 Milvus/Pinecone 中通常为默认配置。` },
+];
+
+// ===================== 状态 =====================
+let currentQ = null;
+let results = {};  // id -> { score, dims, feedback, ts }
+
+// ===================== 渲染侧边栏 =====================
+function renderSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const modules = {};
+  questions.forEach(q => {
+    if (!modules[q.module]) modules[q.module] = [];
+    modules[q.module].push(q);
+  });
+  let html = '';
+  Object.entries(modules).forEach(([mod, qs]) => {
+    html += `<div class="module-title">${mod}</div>`;
+    qs.forEach(q => {
+      const answered = results[q.id] ? 'answered' : '';
+      const active = currentQ && currentQ.id === q.id ? 'active' : '';
+      html += `<div class="q-item ${active} ${answered}" onclick="selectQ(${q.id})">
+        <div class="q-num">${q.id <= 9 ? '0'+q.id : q.id}</div>
+        <div class="q-text">${q.title.substring(0, 40)}...</div>
+      </div>`;
+    });
+  });
+  sidebar.innerHTML = html;
+}
+
+// ===================== 选择题目 =====================
+function selectQ(id) {
+  currentQ = questions.find(q => q.id === id);
+  renderQuestion();
+  renderSidebar();
+  // 清除评分区
+  document.getElementById('scoringPanel').innerHTML = `<div class="scoring-empty">
+    <div class="emoji">📊</div><h3>等待评分</h3><p style="font-size:13px;">填写答案后点击"AI 评分"<br>即可获得详细评分报告</p></div>`;
+}
+
+// ===================== 渲染题目 =====================
+function renderQuestion() {
+  if (!currentQ) return;
+  const answered = results[currentQ.id];
+  document.getElementById('questionPanel').innerHTML = `
+    <div class="module-badge">${currentQ.module}</div>
+    <div class="question-title">Q${currentQ.id}：${currentQ.title}</div>
+    <div class="answer-section">
+      <h3>💬 请在此处填写您的回答</h3>
+      <textarea class="answer-area" id="answerInput"
+        placeholder="请输入您的回答        placeholder="请输入您的回答，越详细越好...">${answered ? answered.text : ''}</textarea>
+      <div class="action-row">
+        <button class="btn btn-primary" id="scoreBtn" onclick="doScoring()">🤖 AI 自动评分</button>
+        <button class="btn btn-secondary" onclick="toggleRef()">📖 查看参考答案</button>
+        ${answered ? `<button class="btn btn-secondary" onclick="goNext()">➡️ 下一题</button>` : ''}
+      </div>
+      <div class="btn-hint">💡 回答越详细，评分越准确。支持随时查看参考答案后再完善回答。</div>
+      <div class="ref-answer" id="refAnswer"><b>📖 参考答案：</b><br><br>${currentQ.ref.replace(/\n/g, '<br>')}</div>
+    </div>
+  `;
+}
+
+// ===================== 切换参考答案 =====================
+function toggleRef() {
+  const el = document.getElementById('refAnswer');
+  if (el) el.classList.toggle('open');
+}
+
+// ===================== AI 评分引擎（本地规则引擎）=====================
+function doScoring() {
+  const text = document.getElementById('answerInput').value.trim();
+  if (!text) { alert('请先填写回答！'); return; }
+  if (text.length < 10) { alert('回答太短，请补充更多内容。'); return; }
+
+  const scoreBtn = document.getElementById('scoreBtn');
+  scoreBtn.disabled = true;
+  scoreBtn.textContent = '⏳ 评分中...';
+
+  // 模拟 AI 评分延迟
+  setTimeout(() => {
+    const result = scoringEngine(text, currentQ);
+    results[currentQ.id] = { ...result, text, ts: Date.now() };
+    renderScoring(result);
+    updateStats();
+    renderSidebar();
+    scoreBtn.disabled = false;
+    scoreBtn.textContent = '🤖 重新评分';
+  }, 1500);
+}
+
+// ===================== 评分引擎 =====================
+function scoringEngine(answer, q) {
+  const text = answer.toLowerCase();
+  let accuracy = 60, completeness = 60, depth = 60;
+
+  // 模块一关键词
+  if (q.id <= 10) {
+    const kw1 = ['token', 'bpe', 'wordpiece', 'sentencepiece', '分词', '子词'];
+    const kw2 = ['attention', 'qkv', 'query', 'key', 'value', '注意力', '缩放'];
+    const kw3 = ['kv cache', '缓存', '加速', '首 token'];
+    const kw4 = ['rope', '旋转', '位置编码', '外推'];
+    const kw5 = ['flash attention', 'io感知', '分块', '显存', 'sram'];
+    const kw6 = ['moe', 'mixtral', 'expert', '稀疏', '激活', 'gate', 'top-k'];
+    const kw7 = ['prefill', 'decode', '计算密集', '访存', 'tensor parallel', '张量并行'];
+    const kw8 = ['speculative', '投机', 'draft', '小模型', '加速'];
+    const kw9 = ['非确定性', '采样', 'temperature', 'deterministic'];
+    const kw10 = ['gqa', 'mha', 'mqa', 'kv头', 'grouped'];
+    const kwSets = [kw1, kw2, kw3, kw4, kw5, kw6, kw7, kw8, kw9, kw10];
+    const ks = kwSets[q.id - 1];
+    const hit = ks.filter(k => text.includes(k)).length;
+    const rate = hit / ks.length;
+    accuracy = Math.min(95, 55 + rate * 40);
+    completeness = Math.min(90, 40 + text.length / 15);
+    depth = Math.min(95, 50 + rate * 30 + (text.length > 200 ? 15 : 0));
+  }
+  // 模块二
+  else if (q.id <= 20) {
+    const kw11 = ['quantiz', 'int8', 'int4', 'fp8', '量化', '压缩'];
+    const kw12 = ['pagedattention', 'paged', '分页', '显存碎片', 'vllm'];
+    const kw13 = ['continuous batching', '动态批', 'iterative', '迭代调度'];
+    const kw14 = ['tensor parallel', '张量并行', 'allreduce', '切分', 'gpu'];
+    const kw15 = ['prefix', '缓存', 'system prompt', '共享'];
+    const kw16 = ['disaggregated', '拆', 'prefill', 'decode', '分离'];
+    const kw17 = ['ttft', 'tpot', 'itl', '延迟', '首 token', 'throughput'];
+    const kw18 = ['qat', 'ptq', '量化感知', '后训练', '校准'];
+    const kw19 = ['mla', 'deepseek', '低秩', '潜在', 'kv cache 压缩'];
+    const kw20 = ['限流', 'rate limit', '令牌桶', '优先级', '调度'];
+    const kwSets = [kw11, kw12, kw13, kw14, kw15, kw16, kw17, kw18, kw19, kw20];
+    const ks = kwSets[q.id - 11];
+    const hit = ks.filter(k => text.includes(k)).length;
+    const rate = hit / Math.max(ks.length, 1);
+    accuracy = Math.min(95, 55 + rate * 40);
+    completeness = Math.min(90, 40 + text.length / 15);
+    depth = Math.min(95, 50 + rate * 30 + (text.length > 200 ? 15 : 0));
+  }
+  // 模块三
+  else if (q.id <= 25) {
+    const kw21 = ['lost in the middle', '中间', '首尾', '重排', 'lost'];
+    const kw22 = ['hybrid', '混合搜索', 'bm25', '向量搜索', 'alpha'];
+    const kw23 = ['rerank', 'cross-encoder', '重排', '精排', '粗排'];
+    const kw24 = ['graph rag', '知识图谱', '图', '实体', '关系', '多跳'];
+    const kw25 = ['hnsw', 'ivf', '索引', 'ann', '向量'];
+    const kwSets = [kw21, kw22, kw23, kw24, kw25];
+    const ks = kwSets[q.id - 21];
+    const hit = ks.filter(k => text.includes(k)).length;
+    const rate = hit / Math.max(ks.length, 1);
+    accuracy = Math.min(95, 55 + rate * 40);
+    completeness = Math.min(90, 40 + text.length / 15);
+    depth = Math.min(95, 50 + rate * 30 + (text.length > 200 ? 15 : 0));
+  }
+  // 模块四
+  else if (q.id <= 30) {
+    const kw26 = ['react', 'thought', 'action', 'observation', '推理', '工具'];
+    const kw27 = ['mcp', 'model context', 'protocol', '标准', '统一'];
+    const kw28 = ['短期', '长期', '情景', '记忆', 'context', '向量', '图谱'];
+    const kw29 = ['沙箱', 'sandbox', 'docker', '安全', '隔离', '权限'];
+    const kw30 = ['function calling', 'mcp', '工具', '标准'];
+    const kwSets = [kw26, kw27, kw28, kw29, kw30];
+    const ks = kwSets[q.id - 26];
+    const hit = ks.filter(k => text.includes(k)).length;
+    const rate = hit / Math.max(ks.length, 1);
+    accuracy = Math.min(95, 55 + rate * 40);
+    completeness = Math.min(90, 40 + text.length / 15);
+    depth = Math.min(95, 50 + rate * 30 + (text.length > 200 ? 15 : 0));
+  }
+  // 模块五、六
+  else {
+    const kw31 = ['vllm', 'tgi', 'tensorrt', 'trt-llm', '推理', '部署', '吞吐'];
+    const kw32 = ['超时', '降级', 'timeout', 'fallback', '降级'];
+    const kw33 = ['gateway', '网关', '路由', '限流', '统一'];
+    const kw34 = ['监控', 'metric', 'latency', 'ttft', '幻觉', '可观测'];
+    const kw35 = ['缓存', 'cache', 'semantic cache', '精确缓存', 'redis'];
+    const kw36 = ['shadow', '影子', '无声', '灰度', '验证'];
+    const kw37 = ['a/b', '分流', '对照组', '实验组', '显著性'];
+    const kw38 = ['prompt', '版本', 'git', 'feature flag', '回滚'];
+    const kw39 = ['并发', '限流', '令牌桶', '队列', 'autoscaling', '扩缩'];
+    const kw40 = ['自托管', 'api', '开源', 'llama', '部署', '隐私', '成本'];
+    const kw41 = ['milvus', 'pinecone', 'chroma', '向量数据库', '选型'];
+    const kw42 = ['mteb', 'benchmark', 'recall', 'mrr', 'ndcg', '评估'];
+    const kw43 = ['hnsw', 'ivf', 'pq', 'ann', '索引', '量化'];
+    const kwSets = [kw31, kw32, kw33, kw34, kw35, kw36, kw37, kw38, kw39, kw40, kw41, kw42, kw43];
+    const ki = q.id - 31;
+    const ks = kwSets[Math.min(ki, kwSets.length - 1)];
+    const hit = ks.filter(k => text.includes(k)).length;
+    const rate = hit / Math.max(ks.length, 1);
+    accuracy = Math.min(95, 55 + rate * 40);
+    completeness = Math.min(90, 40 + text.length / 15);
+    depth = Math.min(95, 50 + rate * 30 + (text.length > 200 ? 15 : 0));
+  }
+
+  const total = Math.round(accuracy * 0.35 + completeness * 0.35 + depth * 0.30);
+
+  // 生成反馈
+  const feedback = [];
+  if (accuracy >= 75) feedback.push({ type: 'strength', text: '✅ 核心概念理解正确，术语使用准确' });
+  else feedback.push({ type: 'weakness', text: '⚠️ 部分核心概念可能理解有偏差，建议复习参考答案' });
+  if (completeness >= 70) feedback.push({ type: 'strength', text: '✅ 回答较为完整，覆盖了主要知识点' });
+  else feedback.push({ type: 'weakness', text: '⚠️ 回答不够完整，建议补充更多相关知识点' });
+  if (depth >= 70) feedback.push({ type: 'strength', text: '✅ 有较好的深度理解，能举一反三' });
+  else feedback.push({ type: 'weakness', text: '⚠️ 回答停留在表面，建议加深对原理的理解' });
+  feedback.push({ type: 'suggestion', text: `💡 建议：结合参考答案对比学习，理解记忆关键词汇` });
+
+  return { total, accuracy, completeness, depth, feedback };
+}
+
+// ===================== 渲染评分结果 =====================
+function renderScoring(r) {
+  const grade = r.total >= 90 ? 'excellent' : r.total >= 75 ? 'good' : r.total >= 60 ? 'pass' : 'fail';
+  const gradeText = r.total >= 90 ? '🥇 优秀' : r.total >= 75 ? '🥈 良好' : r.total >= 60 ? '🥉 一般' : '⚠️ 不足';
+  const gradeLabel = r.total >= 90 ? 'excellent' : r.total >= 75 ? 'good' : r.total >= 60 ? 'pass' : 'fail';
+  const dimColor = r.total >= 90 ? 'accent' : r.total >= 75 ? 'green' : r.total >= 60 ? 'orange' : 'red';
+  const dimScoreColor = r.total >= 90 ? '#f0b840' : r.total >= 75 ? '#4ade80' : r.total >= 60 ? '#fb923c' : '#f87171';
+
+  const fbHtml = r.feedback.map(f => `
+    <div class="feedback-item ${f.type}">
+      <div class="fb-label">${f.type === 'strength' ? '✨ 优势' : f.type === 'weakness' ? '📌 待改进' : '💡 建议'}</div>
+      <div>${f.text}</div>
+    </div>`).join('');
+
+  document.getElementById('scoringPanel').innerHTML = `
+    <div class="scoring-card">
+      <div class="score-header">
+        <div>
+          <div class="score-grade ${gradeLabel}">${gradeText}</div>
+          <div class="score-meta">Q${currentQ.id} · ${currentQ.module}</div>
+        </div>
+        <div class="score-circle ${grade}">${r.total}<span>分</span></div>
+      </div>
+      <div class="dimension">
+        <div class="dim-header"><span class="dim-label">准确性</span><span class="dim-score" style="color:${dimScoreColor}">${r.accuracy}/100</span></div>
+        <div class="dim-bar"><div class="dim-fill ${dimColor}" style="width:${r.accuracy}%"></div></div>
+      </div>
+      <div class="dimension">
+        <div class="dim-header"><span class="dim-label">完整性</span><span class="dim-score" style="color:${dimScoreColor}">${r.completeness}/100</span></div>
+        <div class="dim-bar"><div class="dim-fill ${dimColor}" style="width:${r.completeness}%"></div></div>
+      </div>
+      <div class="dimension">
+        <div class="dim-header"><span class="dim-label">深度</span><span class="dim-score" style="color:${dimScoreColor}">${r.depth}/100</span></div>
+        <div class="dim-bar"><div class="dim-fill ${dimColor}" style="width:${r.depth}%"></div></div>
+      </div>
+      <div class="feedback-section">
+        <div class="feedback-title">📋 详细点评</div>
+        ${fbHtml}
+      </div>
+    </div>
+    <div class="action-row" style="margin-top:8px;">
+      <button class="btn btn-primary" onclick="goNext()">➡️ 下一题</button>
+      <button class="btn btn-secondary" onclick="toggleRef()">📖 查看参考答案</button>
+    </div>
+  `;
+}
+
+// ===================== 更新统计 =====================
+function updateStats() {
+  const answered = Object.keys(results).length;
+  document.getElementById('stat-done').textContent = answered;
+  const scores = Object.values(results).map(r => r.total);
+  if (scores.length > 0) {
+    const avg = Math.round(scores.reduce((a,b)=>a+b,0)/scores.length);
+    document.getElementById('stat-avg').textContent = avg;
+  }
+}
+
+// ===================== 下一题 =====================
+function goNext() {
+  if (!currentQ) return;
+  const idx = questions.findIndex(q => q.id === currentQ.id);
+  if (idx < questions.length - 1) {
+    selectQ(questions[idx + 1].id);
+  } else {
+    // 全部完成
+    document.getElementById('questionPanel').innerHTML = `
+      <div style="text-align:center; padding:60px 0;">
+        <div style="font-size:64px; margin-bottom:20px;">🎉</div>
+        <h2 style="margin-bottom:12px;">面试完成！</h2>
+        <p style="color:var(--text-dim); margin-bottom:24px;">已完成 ${Object.keys(results).length} / ${questions.length} 题</p>
+        ${Object.keys(results).length > 0 ? `
+          <div style="background:var(--surface2); border-radius:12px; padding:24px; display:inline-block;">
+            <div style="font-size:36px; font-weight:700; font-family:'JetBrains Mono',monospace;">
+              ${Math.round(Object.values(results).map(r=>r.total).reduce((a,b)=>a+b,0)/Object.keys(results).length)}
+            </div>
+            <div style="color:var(--text-dim); font-size:13px; margin-top:4px;">综合平均分</div>
+          </div>
+        ` : ''}
+        <div style="margin-top:24px;">
+          <button class="btn btn-primary" onclick="selectQ(1)">🔄 重新开始</button>
+        </div>
+      </div>
+    `;
+  }
+}
+
+// ===================== 初始化 =====================
+renderSidebar();
+</script>
+</body>
+</html>
