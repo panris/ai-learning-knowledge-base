@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LLM 面试系统 - 简化版</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; }
+    .q-item { padding: 10px; margin: 5px 0; background: #f0f0f0; cursor: pointer; border-radius: 4px; }
+    .q-item:hover { background: #e0e0e0; }
+    .q-item.active { background: #007bff; color: white; }
+    .question { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+    textarea { width: 100%; height: 150px; margin: 10px 0; }
+    button { padding: 10px 20px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>LLM 后端面试系统（简化版）</h1>
+  <div id="sidebar"></div>
+  <div id="questionPanel">
+    <p>请从上方选择题目</p>
+  </div>
+
+<script>
+// 简化的题库
+var questions = [
+  { id: 1, module: "LLM基础", title: "什么是 KV Cache？", ref: "KV Cache 是缓存的 Key 和 Value..." },
+  { id: 2, module: "推理优化", title: "什么是 PagedAttention？", ref: "PagedAttention 是分页注意力..." },
+  { id: 3, module: "RAG", title: "什么是混合搜索？", ref: "混合搜索结合向量搜索和 BM25..." }
+];
+
+var currentQ = null;
+var results = {};
+
+function renderSidebar() {
+  var html = '<h3>题库列表</h3>';
+  questions.forEach(function(q) {
+    var active = currentQ && currentQ.id === q.id ? ' active' : '';
+    html += '<div class="q-item' + active + '" onclick="selectQ(' + q.id + ')">' + q.id + '. ' + q.title + '</div>';
+  });
+  document.getElementById('sidebar').innerHTML = html;
+}
+
+function selectQ(id) {
+  currentQ = questions.find(function(q) { return q.id === id; });
+  renderSidebar();
+  renderQuestion();
+}
+
+function renderQuestion() {
+  if (!currentQ) return;
+  var html = '<div class="question">';
+  html += '<h2>Q' + currentQ.id + ': ' + currentQ.title + '</h2>';
+  html += '<textarea id="answerInput" placeholder="请输入你的回答..."></textarea>';
+  html += '<button onclick="submitAnswer()">提交答案</button>';
+  html += '<button onclick="showRef()" style="margin-left:10px;">查看参考答案</button>';
+  html += '<div id="refAnswer" style="display:none; margin-top:10px; padding:10px; background:#ffffcc;">参考答案: ' + currentQ.ref + '</div>';
+  html += '</div>';
+  document.getElementById('questionPanel').innerHTML = html;
+}
+
+function submitAnswer() {
+  var text = document.getElementById('answerInput').value;
+  if (!text) {
+    alert('请先填写回答');
+    return;
+  }
+  results[currentQ.id] = { text: text, score: Math.floor(Math.random() * 30) + 70 };
+  alert('已提交！模拟评分: ' + results[currentQ.id].score + ' 分');
+  renderSidebar();
+}
+
+function showRef() {
+  var el = document.getElementById('refAnswer');
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+// 初始化
+renderSidebar();
+console.log('页面加载完成');
+</script>
+</body>
+</html>
