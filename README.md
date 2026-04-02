@@ -17,6 +17,7 @@
 | [💻 AI 编程实战](./AI编程实战/README.md) | Vibe Coding、AI IDE、全栈开发 |
 | [💻 实战项目](./实战项目/README.md) | 变现项目、开源项目 |
 | [🎯 AI 面试](./AI面试/README.md) | 算法题、机器学习、大厂面经 |
+| [🎬 Claude Code 最佳实践](./Claude Code最佳实践/README.md) | Claude Code CLI 使用技巧、配置指南 |
 | [📰 行业动态](./行业动态/README.md) | AI 最新资讯、政策、趋势 |
 
 ---
