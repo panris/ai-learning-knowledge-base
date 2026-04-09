@@ -171,11 +171,16 @@
 
 ### 开源项目（GitHub）
 
+👉 **[👉 GitHub 热门 AI 开源项目精选](./GitHub热门AI开源项目.md)** — 按类别整理收录 30+ 优质项目
+
 | 项目 | 简介 | 难度 |
 |------|------|------|
 | [ChatGPT-Next-Web](https://github.com/ChatGPTNextWeb/ChatGPT-Next-Web) | 一键部署私人 ChatGPT 网站 | 中等 |
 | [LangChain](https://github.com/langchain-ai/langchain) | AI 应用开发框架 | 困难 |
 | [AutoGPT](https://github.com/Significant-Gravitas/AutoGPT) | 自主 AI 代理 | 困难 |
+| [Dify](https://github.com/langgenius/dify) | 开源 LLM 应用开发平台 | 中等 |
+| [Ollama](https://github.com/ollama/ollama) | 本地运行大模型 | 简单 |
+| [LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory) | LLM 微调框架 | 困难 |
 
 ### 项目灵感网站
 
