@@ -17,6 +17,7 @@
 | [🧠 内存管理](./claude-memory.md) | CLAUDE.md 文件写法和加载机制 | 112 行 |
 | [🎯 技能系统](./claude-skills.md) | Skills 技能配置和使用 | 47 行 |
 | [🤖 子代理](./claude-subagents.md) | Subagents 配置和最佳实践 | 49 行 |
+| [💾 Claude-Mem 记忆系统](./claude-mem.md) | 跨会话持久化记忆，自动回顾历史工作 | — |
 
 ---
 
