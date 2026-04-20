@@ -5,6 +5,75 @@
 
 ---
 
+## 🔥 2026年4月 新晋热门项目
+
+### OpenClaw
+- **链接**：https://github.com/openclaw/openclaw
+- **Star**：302k ⭐
+- **简介**：开源个人 AI 助手，全平台通用（Any OS, Any Platform），支持信号、Telegram、Discord 等多渠道，2026 年增长最快项目
+
+### Hermes Agent
+- **链接**：https://github.com/NousResearch/hermes-agent
+- **Star**：47k+ ⭐
+- **简介**：会自我进化的 AI 助手框架，2 个月内登顶 GitHub Trending 全站第一，一行命令安装，支持自主任务分解与执行
+
+### DeerFlow 2.0
+- **链接**：https://github.com/bytedance/DeerFlow
+- **Star**：57k ⭐
+- **简介**：字节跳动开源的超级智能体，从"深度研究框架"蜕变为"Super Agent 运行时基础设施"，支持可插拔技能，登顶 GitHub Trending
+
+### Claude Code
+- **链接**：https://github.com/anthropics/claude-code
+- **Star**：100k+ ⭐
+- **简介**：Anthropic 推出的终端智能编码助手，AI 编程能力带入命令行，支持工具调用、多文件编辑
+
+### Codex CLI
+- **链接**：https://github.com/openai/codex-cli
+- **Star**：50k+ ⭐
+- **简介**：OpenAI 推出的终端编程助手，与 Claude Code 竞争的 AI 编码工具
+
+### Goose
+- **链接**：https://github.com/block/goose
+- **Star**：35.4k ⭐
+- **简介**：本地运行的 AI 工程自动化代理，自主完成代码编写、调试和工作流协调
+
+### VibeVoice
+- **链接**：https://github.com/microsoft/VibeVoice
+- **Star**：15k+ ⭐
+- **简介**：微软开源的语音 AI 平台，支持高质量语音合成与对话
+
+### Onyx
+- **链接**：https://github.com/onyx-dot-app/onyx
+- **Star**：23.8k ⭐
+- **简介**：企业级 AI 对话平台，支持知识库、多模型接入，可私有化部署
+
+### OpenScreen
+- **链接**：https://github.com/OpenScreenDev/OpenScreen
+- **Star**：19k ⭐
+- **简介**：免费开源的屏幕录制工具，支持产品演示录制，每天增长 100+ 星
+
+### OmX
+- **链接**：https://github.com/omx-pro/omx
+- **Star**：15.1k ⭐
+- **简介**：Codex CLI 工作流增强层，为 AI 编程助手提供规范化工作流，每天增长 200+ 星
+
+### TimesFM
+- **链接**：https://github.com/google-research/timesfm
+- **Star**：14k ⭐
+- **简介**：Google 开源的时间序列预测基础模型，支持多领域时序数据分析
+
+### prompts.chat
+- **链接**：https://github.com/f/awesome-chatgpt-prompts
+- **Star**：157k ⭐
+- **简介**：全球最大开源 AI 提示词库，兼容多种主流 AI 助手
+
+### Superpowers
+- **链接**：https://github.com/obra/superpowers
+- **Star**：145.6k ⭐
+- **简介**：AI 智能体技能框架和软件开发方法论，2026 年 4 月新晋项目
+
+---
+
 ## 🤖 AI Agent / 浏览器自动化
 
 ### browser-use
@@ -149,4 +218,4 @@
 
 ---
 
-*最后更新：2025年4月*
+*最后更新：2026年4月20日*
