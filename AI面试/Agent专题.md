@@ -143,7 +143,7 @@
 **Q18：如何处理多模态输入输出？**
 > - 输入：图片 → VLM 描述 → 文本 Agent 处理
 > - 输出：文本 → 图片生成 API
-> - 工具：GPT-4V、Claude 3.5 Sonnet 原生多模态
+> - 工具：GPT-4o、Claude Sonnet 4 等原生多模态模型
 
 ---
 

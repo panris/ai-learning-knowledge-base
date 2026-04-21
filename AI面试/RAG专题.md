@@ -87,6 +87,7 @@
 **Q14：什么是 Graph RAG？**
 > 将知识组织为图结构（实体+关系），结合图遍历和向量检索。
 > 适用：复杂关系推理、多跳问题、实体关系密集的场景。
+> 实现框架：Microsoft GraphRAG（最知名实现）、LlamaIndex KnowledgeGraphQueryEngine
 
 **Q15：如何处理结构化数据（表格、SQL）？**
 > - 表格：Text-to-SQL + 自然语言查询
