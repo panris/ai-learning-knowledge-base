@@ -61,7 +61,7 @@
 **Q12：什么是 Grouped-Query Attention (GQA)？**
 > 多个 Query 头共享同一组 Key/Value 头，减少 KV Cache 内存。
 > 介于 MHA（每头独立 KV）和 MQA（所有头共享 KV）之间。
-> 实际应用：LLaMA 2 70B 使用 GQA（8 个 KV 头），7B/13B 仍用 MHA；LLaMA 3、Mistral 均采用 GQA，显著降低长序列推理内存。
+> 实际应用：LLaMA 2 全系列使用 GQA（70B 和 8B 均采用），7B 使用 4 个 KV 头，70B 使用 8 个 KV 头；LLaMA 3、Mistral 均采用 GQA，显著降低长序列推理内存。
 
 ---
 
