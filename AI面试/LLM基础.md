@@ -91,9 +91,9 @@
 **Q18：什么是 Flash Attention？**
 > 一种注意力计算的 IO 感知算法，通过分块计算减少内存访问，加速注意力计算并降低显存峰值。
 > 版本演进：
-> - **Flash Attention 1** (Dao et al., 2022)：精确注意力，支持前向/反向，首次实现 IO 感知加速
-> - **Flash Attention 2** (Dao et al., 2023)：进一步优化内存，支持 GQA 和并行前向/反向
-> - **Flash Attention 3** (2024)：支持块稀疏模式（block-sparse），更大规模下加速更明显
+> - **Flash Attention 1** (Dao et al., 2022)：精确注意力，支持前向/反向，首次实现 IO 感知加速；支持 block-sparse 稀疏注意力
+> - **Flash Attention 2** (Dao et al., 2023)：进一步优化并行度，支持 GQA/MQA，前向速度提升约 2×
+> - **Flash Attention 3** (2024)：针对 H100 优化，利用异步（WGMMA/TMA）和低精度（FP8）计算，H100 上速度提升约 1.5-2×
 
 **Q19：什么是 RoPE（旋转位置编码）？**
 > 通过旋转矩阵在复数域编码位置信息。优点：支持外推（通过缩放扩展上下文长度）。
@@ -145,7 +145,7 @@
 | Tokenizer 拆分专业术语 | 添加自定义 token + 微调 Tokenizer + 特殊 token |
 | KV Cache 内存过大 | Paged Attention + GQA + 滑动窗口 + 量化 KV Cache |
 | 长文档注意力计算 O(n²) 内存不足 | Flash Attention + 稀疏注意力 + Ring Attention |
-| 蒙馏模型复杂推理能力下降 | 知识蒸馏 + 保留困难样本 + 渐进式蒸馏 + 对齐蒸馏 |
+| 蒸馏模型复杂推理能力下降 | 知识蒸馏 + 保留困难样本 + 渐进式蒸馏 + 对齐蒸馏 |
 | RLHF 后能力下降（对齐税） | DPO 替代 RLHF + 混合训练数据 + 分阶段对齐 |
 | RLHF 模型奖励黑客行为 | 奖励模型迭代 + 多元奖励信号 + 红队测试 |
 | 模型量化导致能力下降 | 量化感知训练(QAT) + 混合精度量化(保留关键层FP16) + 后训练量化校准 |
