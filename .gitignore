@@ -40,3 +40,4 @@ build/
 .env.local
 credentials.json
 *.pem
+java-demo/target/
