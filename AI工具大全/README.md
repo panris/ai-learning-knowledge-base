@@ -71,6 +71,9 @@ Claude 的设计能力背后有一套完整的系统提示词，涵盖：
 | Midjourney | 画质最高，风格多 | 中等 |
 | Stable Diffusion | 免费开源，可本地运行 | 较难 |
 | DALL-E 3 | OpenAI出品，集成ChatGPT | 简单 |
+| GPT Image 2 | OpenAI新一代，文字渲染+多图一致性 | 简单 |
+
+> 🎨 **GPT Image 2 提示词大全**：1,526 条精选提示词，按场景/风格分类 → [AI生图提示词](../AI生图提示词/README.md)
 
 ---
 

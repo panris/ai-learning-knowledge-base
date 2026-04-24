@@ -12,6 +12,7 @@
 | [🌱 0基础AI实用技能](./0基础AI实用技能/README.md) | 50场景指令库 + ABCD万能公式 + 飞书AI咒语 |
 | [🧠 大模型专区](./大模型专区/README.md) | GPT、Claude、Gemini、国产大模型 |
 | [✍️ 提示词工程](./提示词工程/README.md) | Prompt 技巧、模板、实战案例 |
+| [🎨 AI生图提示词](./AI生图提示词/README.md) | GPT Image 2 提示词 1526 条，按场景/风格分类 |
 | [🛠️ AI工具大全](./AI工具大全/README.md) | 各类 AI 工具汇总与使用指南 |
 | [🎬 视频教程](./视频教程/README.md) | B站、YouTube 精选视频课程 |
 | [📄 论文精选](./论文精选/README.md) | 重要 AI 论文导读与解析 |
@@ -32,6 +33,8 @@
 **想用 AI 工具提效？** 直接看 → [AI工具大全](./AI工具大全/README.md)
 
 **想学写提示词？** 跳转 → [提示词工程](./提示词工程/README.md)
+
+**想用 AI 生图？** 跳转 → [AI生图提示词](./AI生图提示词/README.md)
 
 **想了解大模型原理？** 进入 → [大模型专区](./大模型专区/README.md)
 
@@ -75,6 +78,7 @@ GitHub 仓库：https://github.com/panris/ai-learning-knowledge-base
 | `0基础AI实用技能/` | ABCD公式卡、50场景指令库、视频分镜、飞书AI咒语 |
 | `大模型专区/` | 主流大模型介绍与对比 |
 | `提示词工程/` | Prompt 技巧与实用模板 |
+| `AI生图提示词/` | GPT Image 2 提示词大全（1526 条） |
 | `AI工具大全/` | 50+ 款 AI 工具推荐 |
 | `视频教程/` | B站/YouTube 精选课程 |
 | `论文精选/` | 经典 AI 论文导读 |
@@ -84,4 +88,4 @@ GitHub 仓库：https://github.com/panris/ai-learning-knowledge-base
 
 ---
 
-*最后更新：2025年3月*
+*最后更新：2026年4月*
