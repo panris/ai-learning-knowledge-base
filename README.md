@@ -21,7 +21,6 @@
 | [🎯 AI 面试](./AI面试/README.md) | 算法题、机器学习、大厂面经 |
 | [🎬 Claude Code 最佳实践](./Claude Code最佳实践/README.md) | Claude Code CLI 使用技巧、配置指南 |
 | [📰 行业动态](./行业动态/README.md) | AI 最新资讯、政策、趋势 |
-| [💬 姚金刚提示词](./姚金刚提示词/README.md) | 中文 AI 提示词库（66条）|
 | [🧩 Hermes Agent](./Hermes-Agent/README.md) | Nous Research 自改进 AI Agent（多模型/多平台/自进化）|
 | [🚀 Harness CD](./Harness-CD/README.md) | CI/CD 持续交付平台（Docker/Kubernetes 部署）|
 
@@ -40,8 +39,6 @@
 **想用 AI 生图？** 跳转 → [AI生图提示词](./AI生图提示词/README.md)
 
 **想了解大模型原理？** 进入 → [大模型专区](./大模型专区/README.md)
-
-**想找优质提示词？** 跳转 → [姚金刚提示词](./姚金刚提示词/README.md)
 
 **想学自改进 AI Agent？** 跳转 → [Hermes Agent](./Hermes-Agent/README.md)
 
@@ -92,12 +89,11 @@ GitHub 仓库：https://github.com/panris/ai-learning-knowledge-base
 | `视频教程/` | B站/YouTube 精选课程 |
 | `论文精选/` | 经典 AI 论文导读 |
 | `实战项目/` | 10 个可落地项目 |
-| `AI面试/` | 算法题、机器学习、大厂面经 |
+| `AI面试/` | 算法题、机��学习、大厂面经 |
 | `行业动态/` | 最新资讯与趋势 |
-| `姚金刚提示词/` | 中文 AI 提示词库（66条，内容/方法/学习等）|
 | `Hermes-Agent/` | Nous Research 自改进 AI Agent（多模型/多平台/自进化）|
 | `Harness-CD/` | CI/CD 持续交付平台（已归档，推荐迁移 Gitness）|
 
 ---
 
-*最后更新：2026年5月7日*
+*最后更新：2026年5月*
