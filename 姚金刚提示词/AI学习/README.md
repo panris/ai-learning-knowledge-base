@@ -1,0 +1,13 @@
+- [keyword-learning-assistant](keyword-learning-assistant.md)
+- [memory-technique-coach](memory-technique-coach.md)
+- [personalized-habit-formation-planner](personalized-habit-formation-planner.md)
+---
+### 学习方法
+- [cornell-note-method](cornell-note-method.md)
+- [feynman-learning-method](feynman-learning-method.md)
+- [feynman-questioning-coach](feynman-questioning-coach.md)
+- [keyword-learning-method](keyword-learning-method.md)
+- [pomodoro-learning-coach](pomodoro-learning-coach.md)
+- [simon-learning-method](simon-learning-method.md)
+- [sq3r-reading-method](sq3r-reading-method.md)
+- [super-memory-method](super-memory-method.md)
