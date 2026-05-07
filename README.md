@@ -89,7 +89,7 @@ GitHub 仓库：https://github.com/panris/ai-learning-knowledge-base
 | `视频教程/` | B站/YouTube 精选课程 |
 | `论文精选/` | 经典 AI 论文导读 |
 | `实战项目/` | 10 个可落地项目 |
-| `AI面试/` | 算法题、机��学习、大厂面经 |
+| `AI面试/` | 算法题、机器学习、大厂面经 |
 | `行业动态/` | 最新资讯与趋势 |
 | `Hermes-Agent/` | Nous Research 自改进 AI Agent（多模型/多平台/自进化）|
 | `Harness-CD/` | CI/CD 持续交付平台（已归档，推荐迁移 Gitness）|
