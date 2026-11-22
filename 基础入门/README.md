@@ -5,6 +5,7 @@
 ### 学习方法
 - [cornell-note-method](cornell-note-method.md)
 - [feynman-learning-method](feynman-learning-method.md)
+- [compare-ai-tutorial-prompts](compare-ai-tutorial-prompts.md)
 - [feynman-questioning-coach](feynman-questioning-coach.md)
 - [keyword-learning-method](keyword-learning-method.md)
 - [pomodoro-learning-coach](pomodoro-learning-coach.md)
